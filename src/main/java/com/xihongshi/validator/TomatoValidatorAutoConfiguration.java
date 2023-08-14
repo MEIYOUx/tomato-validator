@@ -1,6 +1,6 @@
 package com.xihongshi.validator;
 
-import com.xihongshi.validator.core.ValidationAspect;
+import com.xihongshi.validator.core.ValidateAspect;
 import com.xihongshi.validator.core.ValidatorFactory;
 import com.xihongshi.validator.core.impl.DefaultValidatorFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -26,7 +26,7 @@ public class TomatoValidatorAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ValidationAspect validationAspect(ValidatorFactory factory) {
-        return new ValidationAspect(factory);
+    public ValidateAspect validationAspect(ValidatorFactory factory) {
+        return new ValidateAspect(properties, factory);
     }
 }
