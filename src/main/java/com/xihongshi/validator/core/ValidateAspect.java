@@ -31,6 +31,10 @@ public class ValidateAspect {
 
     @Before("@annotation(com.xihongshi.validator.constraints.Constraints)")
     public void validate(JoinPoint joinPoint) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        if (!properties.isEnable()) {
+            return;
+        }
+
         Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
         ValidateContext context = createContext(method, joinPoint.getArgs());
 
