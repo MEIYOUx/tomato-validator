@@ -1,16 +1,16 @@
 package com.xihongshi.validator.model;
 
-import com.xihongshi.validator.exception.ValidationException;
+import com.xihongshi.validator.exception.ValidateException;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ValidationResult {
+public class ValidateResult {
 
-    private final List<ValidationException> exceptionList = new ArrayList<>(0);
+    private final List<ValidateException> exceptionList = new ArrayList<>(0);
 
-    public void addException(ValidationException e) {
+    public void addException(ValidateException e) {
         exceptionList.add(e);
     }
 
@@ -18,7 +18,7 @@ public class ValidationResult {
         return exceptionList.size() == 0;
     }
 
-    public List<ValidationException> getExceptionList() {
+    public List<ValidateException> getExceptionList() {
         return Collections.unmodifiableList(exceptionList);
     }
 }

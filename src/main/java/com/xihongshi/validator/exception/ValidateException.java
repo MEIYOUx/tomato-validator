@@ -1,11 +1,11 @@
 package com.xihongshi.validator.exception;
 
-public class ValidationException extends RuntimeException {
+public class ValidateException extends RuntimeException {
 
     private final Integer code;
     private final String message;
 
-    public ValidationException(Integer code, String message) {
+    public ValidateException(Integer code, String message) {
         super(message);
         this.code = code;
         this.message = message;

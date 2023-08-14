@@ -2,14 +2,14 @@ package com.xihongshi.validator.model;
 
 import java.lang.annotation.Annotation;
 
-public class ValidationItem {
+public class ValidateItem {
 
     private final Object object;
     private final Class<? extends Annotation> annotationType;
     private final Integer code;
     private final String message;
 
-    public ValidationItem(Object object, Class<? extends Annotation> annotationType, Integer code, String message) {
+    public ValidateItem(Object object, Class<? extends Annotation> annotationType, Integer code, String message) {
         this.object = object;
         this.annotationType = annotationType;
         this.code = code;
