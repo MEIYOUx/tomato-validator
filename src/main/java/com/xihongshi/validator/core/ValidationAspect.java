@@ -14,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Aspect
 public class ValidationAspect {
@@ -30,7 +31,7 @@ public class ValidationAspect {
         ValidationContext context = createContext(method, joinPoint.getArgs());
         for (ValidationItem item : context.getItems()) {
             Validator validator = validatorFactory.createValidator(item.getAnnotationType());
-            if (!validator.validate(item.getObject())) {
+            if (Objects.nonNull(validator) && !validator.validate(item.getObject())) {
                 throw new ValidationException(item.getCode(), item.getMessage());
             }
         }
