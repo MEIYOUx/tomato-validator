@@ -40,8 +40,8 @@ public class ValidateAspect {
 
         ValidateResult result = new ValidateResult();
         for (ValidateItem item : context.getItems()) {
-            Validator validator = validatorFactory.createValidator(item.getAnnotationType());
-            boolean isPassed = validator.validate(item.getObject());
+            Validator validator = validatorFactory.createValidator(item.getAnnotation().annotationType());
+            boolean isPassed = validator.validate(item.getObject(), item.getAnnotation());
             if (!isPassed) {
                 result.addException(new ValidateException(item.getCode(), item.getMessage()));
             }
@@ -94,7 +94,7 @@ public class ValidateAspect {
             if (AnnotationUtil.hasAnnotationByClass(annotation, Constraints.class)) {
                 Object code = annotation.annotationType().getDeclaredMethod(Constraints.CODE).invoke(annotation);
                 Object message = annotation.annotationType().getDeclaredMethod(Constraints.MESSAGE).invoke(annotation);
-                items.add(new ValidateItem(field.get(arg), annotation.annotationType(), (Integer) code, (String) message));
+                items.add(new ValidateItem(field.get(arg), annotation, (Integer) code, (String) message));
             }
         }
         return items;

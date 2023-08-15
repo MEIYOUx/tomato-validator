@@ -5,13 +5,13 @@ import java.lang.annotation.Annotation;
 public class ValidateItem {
 
     private final Object object;
-    private final Class<? extends Annotation> annotationType;
+    private final Annotation annotation;
     private final Integer code;
     private final String message;
 
-    public ValidateItem(Object object, Class<? extends Annotation> annotationType, Integer code, String message) {
+    public ValidateItem(Object object, Annotation annotation, Integer code, String message) {
         this.object = object;
-        this.annotationType = annotationType;
+        this.annotation = annotation;
         this.code = code;
         this.message = message;
     }
@@ -20,8 +20,8 @@ public class ValidateItem {
         return object;
     }
 
-    public Class<? extends Annotation> getAnnotationType() {
-        return annotationType;
+    public Annotation getAnnotation() {
+        return annotation;
     }
 
     public Integer getCode() {
@@ -36,7 +36,7 @@ public class ValidateItem {
     public String toString() {
         return "ValidationItem{" +
                 "object=" + object +
-                ", annotationType=" + annotationType +
+                ", annotation=" + annotation +
                 ", code=" + code +
                 ", message='" + message + '\'' +
                 '}';
