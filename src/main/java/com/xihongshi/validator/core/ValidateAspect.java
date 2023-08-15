@@ -29,7 +29,7 @@ public class ValidateAspect {
         this.validatorFactory = validatorFactory;
     }
 
-    @Before("@annotation(com.xihongshi.validator.constraints.Constraints)")
+    @Before("@annotation(com.xihongshi.validator.constraints.Valid)")
     public void validate(JoinPoint joinPoint) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         if (!properties.isEnable()) {
             return;
@@ -41,7 +41,14 @@ public class ValidateAspect {
         ValidateResult result = new ValidateResult();
         for (ValidateItem item : context.getItems()) {
             Validator validator = validatorFactory.createValidator(item.getAnnotation().annotationType());
-            boolean isPassed = validator.validate(item.getObject(), item.getAnnotation());
+            boolean isPassed;
+            try {
+                isPassed = validator.validate(item.getObject(), item.getAnnotation());
+            }
+            catch (ValidateException e) {
+                result.addException(e);
+                continue;
+            }
             if (!isPassed) {
                 result.addException(new ValidateException(item.getCode(), item.getMessage()));
             }
