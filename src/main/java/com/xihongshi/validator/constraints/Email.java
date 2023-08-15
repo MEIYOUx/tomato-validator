@@ -12,4 +12,5 @@ public @interface Email {
 
     int code() default 400;
     String message() default "邮箱格式不正确";
+    String regex() default "^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
 }
