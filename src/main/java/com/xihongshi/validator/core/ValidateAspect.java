@@ -64,8 +64,8 @@ public class ValidateAspect {
             throw result.getExceptionList().get(0);
         }
         throw new MultiValidateException(
-                properties.getMultiFailCode(),
-                properties.getMultiFailMessage(),
+                properties.getDefaultErrorCode(),
+                properties.getDefaultErrorMessage(),
                 result.getExceptionList()
         );
     }
@@ -98,7 +98,7 @@ public class ValidateAspect {
         List<ValidateItem> items = new ArrayList<>();
         Annotation[] annotations = field.getAnnotations();
         for (Annotation annotation : annotations) {
-            if (AnnotationUtil.hasAnnotationByClass(annotation, Constraints.class)) {
+            if (AnnotationUtil.hasAnnotation(annotation, Constraints.class)) {
                 Object code = annotation.annotationType().getDeclaredMethod(Constraints.CODE).invoke(annotation);
                 Object message = annotation.annotationType().getDeclaredMethod(Constraints.MESSAGE).invoke(annotation);
                 items.add(new ValidateItem(field.get(arg), annotation, (Integer) code, (String) message));
