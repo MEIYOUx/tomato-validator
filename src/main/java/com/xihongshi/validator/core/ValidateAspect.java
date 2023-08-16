@@ -17,6 +17,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Aspect
 public class ValidateAspect {
@@ -30,7 +31,7 @@ public class ValidateAspect {
     }
 
     @Before("@annotation(com.xihongshi.validator.constraints.Valid)")
-    public void validate(JoinPoint joinPoint) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public void validate(JoinPoint joinPoint) {
         if (!properties.isEnable()) {
             return;
         }
@@ -70,7 +71,7 @@ public class ValidateAspect {
         );
     }
 
-    private ValidateContext createContext(Method method, Object[] args) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private ValidateContext createContext(Method method, Object[] args) {
         ValidateContext context = new ValidateContext();
         Parameter[] parameters = method.getParameters();
         for (int i = 0; i < parameters.length; i++) {
@@ -83,27 +84,101 @@ public class ValidateAspect {
         return context;
     }
 
-    private List<ValidateItem> createItems(Parameter parameter, Object arg) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private List<ValidateItem> createItems(Parameter parameter, Object arg) {
         List<ValidateItem> items = new ArrayList<>();
         Class<?> type = parameter.getType();
         Field[] fields = type.getDeclaredFields();
         for (Field field : fields) {
-            field.setAccessible(true);
             items.addAll(createItems(field, arg));
         }
         return items;
     }
 
-    private List<ValidateItem> createItems(Field field, Object arg) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    private List<ValidateItem> createItems(Field field, Object arg) {
         List<ValidateItem> items = new ArrayList<>();
         Annotation[] annotations = field.getAnnotations();
+        field.setAccessible(true);
         for (Annotation annotation : annotations) {
             if (AnnotationUtil.hasAnnotation(annotation, Constraints.class)) {
-                Object code = annotation.annotationType().getDeclaredMethod(Constraints.CODE).invoke(annotation);
-                Object message = annotation.annotationType().getDeclaredMethod(Constraints.MESSAGE).invoke(annotation);
-                items.add(new ValidateItem(field.get(arg), annotation, (Integer) code, (String) message));
+                items.add(new ValidateItem(
+                        safetyGet(field, arg), 
+                        annotation, 
+                        getCodeFromAnnotation(annotation), 
+                        getMessageFromAnnotation(annotation)
+                ));
             }
         }
         return items;
+    }
+
+    /**
+     * 安全地从 Field 对象中获取值，保证至少能够获取到 null值，而不是抛出异常。
+     * @param field  字段
+     * @param object 对象
+     * @return Field 对象中获取值，保证至少能够获取到 null值，而不是抛出异常。
+     */
+    private Object safetyGet(Field field, Object object) {
+        if (Objects.isNull(field)) {
+            return null;
+        }
+        try {
+            return field.get(object);
+        } catch (IllegalAccessException e) {
+            return null;
+        }
+    }
+
+    /**
+     * 从注解中解析出 code，通过获取注解中定义的名称为 {@link Constraints}.CODE 的方法。
+     * 如果解析失败，则返回 properties 中配置的默认错误代码 {@link TomatoValidatorProperties}.defaultErrorCode。
+     * @param annotation 注解对象
+     * @return 注解中的code，如果解析失败，则返回 properties 中配置的默认错误代码 {@link TomatoValidatorProperties}.defaultErrorCode。
+     * @see Constraints
+     * @see TomatoValidatorProperties
+     */
+    private int getCodeFromAnnotation(Annotation annotation) {
+        if (Objects.isNull(annotation)) {
+            return properties.getDefaultErrorCode();
+        }
+        
+        Object code;
+        try {
+            code = annotation.annotationType().getDeclaredMethod(Constraints.CODE).invoke(annotation);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            return properties.getDefaultErrorCode();
+        }
+        
+        try {
+            return Integer.parseInt(String.valueOf(code));
+        }
+        catch (NumberFormatException e) {
+            return properties.getDefaultErrorCode();
+        }
+    }
+    
+    /**
+     * 从注解中解析出 message，通过获取注解中定义的名称为 {@link Constraints}.MESSAGE 的方法。
+     * 如果解析失败，则返回 properties 中配置的默认错误消息 {@link TomatoValidatorProperties}.defaultErrorMessage。
+     * @param annotation 注解对象
+     * @return 注解中的message，如果解析失败，则返回 properties 中配置的默认错误消息 {@link TomatoValidatorProperties}.defaultErrorMessage。
+     * @see Constraints
+     * @see TomatoValidatorProperties
+     */
+    private String getMessageFromAnnotation(Annotation annotation) {
+        if (Objects.isNull(annotation)) {
+            return properties.getDefaultErrorMessage();
+        }
+        
+        Object message;
+        try {
+            message = annotation.annotationType().getDeclaredMethod(Constraints.MESSAGE).invoke(annotation);
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            return properties.getDefaultErrorMessage();
+        }
+        
+        if (!(message instanceof String)) {
+            return properties.getDefaultErrorMessage();
+        }
+        return (String) message;
     }
 }
