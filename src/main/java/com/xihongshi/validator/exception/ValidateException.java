@@ -1,5 +1,10 @@
 package com.xihongshi.validator.exception;
 
+/**
+ * 验证异常，包含了：错误代码、错误消息。
+ * 当验证不通过时应该抛出该类型异常。
+ * @author iuhay
+ */
 public class ValidateException extends RuntimeException {
 
     private final Integer code;
