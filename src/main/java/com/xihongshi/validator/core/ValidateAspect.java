@@ -51,7 +51,9 @@ public class ValidateAspect {
                 continue;
             }
             if (!isPassed) {
-                result.addException(new ValidateException(item.getCode(), item.getMessage()));
+                Integer code = getCodeFromAnnotation(item.getAnnotation());
+                String message = getMessageFromAnnotation(item.getAnnotation());
+                result.addException(new ValidateException(code, message));
             }
             if (!isPassed && properties.isFastValidate()) {
                 break;
@@ -102,9 +104,7 @@ public class ValidateAspect {
             if (AnnotationUtil.hasAnnotation(annotation, Constraints.class)) {
                 items.add(new ValidateItem(
                         safetyGet(field, arg), 
-                        annotation, 
-                        getCodeFromAnnotation(annotation), 
-                        getMessageFromAnnotation(annotation)
+                        annotation
                 ));
             }
         }
