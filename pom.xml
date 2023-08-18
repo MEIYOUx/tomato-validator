@@ -12,7 +12,7 @@
 
     <groupId>com.xihongshi</groupId>
     <artifactId>tomato-validator</artifactId>
-    <version>0.0.1.beta</version>
+    <version>0.0.1-beta</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
